@@ -74,6 +74,7 @@ These generate a report for a related set of variables
 - [`reportCostsMACCS()`](reportCostsMACCS.md) : reportCostsMACCS
 - [`reportCostsPresolve()`](reportCostsPresolve.md) :
   reportCostsPresolve
+- [`reportCostsTrade()`](reportCostsTrade.md) : reportCostsTrade
 - [`reportCostsWholesale()`](reportCostsWholesale.md) :
   reportCostsWholesale
 - [`reportCostsWithoutIncentives()`](reportCostsWithoutIncentives.md) :
@@ -372,10 +373,24 @@ Calculate reporting variables
 - [`disaggregateLandConservation()`](disaggregateLandConservation.md) :
   disaggregateLandConservation
 - [`discountRates()`](discountRates.md) : discountRates
+- [`embodiedBiodiversity()`](embodiedBiodiversity.md) :
+  embodiedBiodiversity
+- [`embodiedEmissions()`](embodiedEmissions.md) : embodiedEmissions
+- [`embodiedLabor()`](embodiedLabor.md) : embodiedLabor
+- [`embodiedLand()`](embodiedLand.md) : embodiedLand
+- [`embodiedWater()`](embodiedWater.md) : embodiedWater
 - [`emisCO2()`](emisCO2.md) : emisCO2
 - [`emisSOC()`](emisSOC.md) : emisSOC
 - [`expenditureIndexFood()`](expenditureIndexFood.md) :
   expenditureIndexFood
+- [`extractBiogasFeedstock()`](extractBiogasFeedstock.md) :
+  extractBiogasFeedstock
+- [`extractCropResidues2ndBE()`](extractCropResidues2ndBE.md) :
+  extractCropResidues2ndBE
+- [`extractManureFuel()`](extractManureFuel.md) : extractManureFuel
+- [`extractProcessingWoodResidues()`](extractProcessingWoodResidues.md)
+  : extractProcessingWoodResidues
+- [`extractWoodFuel()`](extractWoodFuel.md) : extractWoodFuel
 - [`factorCostShares()`](factorCostShares.md) : factorCostShares
 - [`factorCosts()`](factorCosts.md) : factorCosts
 - [`fallow()`](fallow.md) : fallow
@@ -413,9 +428,11 @@ Calculate reporting variables
 - [`primaryPerSecondary()`](primaryPerSecondary.md) :
   primaryPerSecondary
 - [`processing()`](processing.md) : processing
+- [`productEmissions()`](productEmissions.md) : productEmissions
 - [`production()`](production.md) : production
 - [`productionProfit()`](productionProfit.md) : productionProfit
 - [`productionRevenue()`](productionRevenue.md) : productionRevenue
+- [`readGDXBilateral()`](readGDXBilateral.md) : readGDXBilateral
 - [`relativeHourlyLaborCosts()`](relativeHourlyLaborCosts.md) :
   relativeHourlyLaborCosts
 - [`ruralDemandShares()`](ruralDemandShares.md) : ruralDemandShares
@@ -427,7 +444,10 @@ Calculate reporting variables
 - [`timePeriods()`](timePeriods.md) : timePeriods
 - [`totalHoursWorked()`](totalHoursWorked.md) : totalHoursWorked
 - [`trade()`](trade.md) : trade
+- [`tradeKastner()`](tradeKastner.md) : tradeKastner
 - [`tradeValue()`](tradeValue.md) : tradeValue
+- [`tradedPrimariesBilateral()`](tradedPrimariesBilateral.md) :
+  tradedPrimariesBilateral
 - [`wageDevelopment()`](wageDevelopment.md) : wageDevelopment
 - [`wageRent()`](wageRent.md) : wageRent
 - [`waterEFR()`](waterEFR.md) : waterEFR
