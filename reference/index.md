@@ -51,6 +51,8 @@ These generate a report for a related set of variables
   reportAnthropometrics
 - [`reportBII()`](reportBII.md) : reportBII
 - [`reportBiochar()`](reportBiochar.md) : reportBiochar
+- [`reportBiogasFeedstock()`](reportBiogasFeedstock.md) :
+  reportBiogasFeedstock
 - [`reportBioplasticDemand()`](reportBioplasticDemand.md) :
   reportBioplasticDemand
 - [`reportCarbonstock()`](reportCarbonstock.md) : reportCarbonstock
@@ -81,6 +83,8 @@ These generate a report for a related set of variables
   reportCostsWithoutIncentives
 - [`reportCropDiversity()`](reportCropDiversity.md) :
   reportCropDiversity
+- [`reportCropResidues2ndBE()`](reportCropResidues2ndBE.md) :
+  reportCropResidues2ndBE
 - [`reportCroparea()`](reportCroparea.md) : reportCroparea
 - [`reportCropareaGrid()`](reportCropareaGrid.md) : reportCropareaGrid
 - [`reportDemand()`](reportDemand.md) : reportDemand
@@ -137,6 +141,7 @@ These generate a report for a related set of variables
 - [`reportLivestockShare()`](reportLivestockShare.md) :
   reportLivestockShare
 - [`reportManure()`](reportManure.md) : reportManure
+- [`reportManureFuel()`](reportManureFuel.md) : reportManureFuel
 - [`reportNetForestChange()`](reportNetForestChange.md) :
   reportNetForestChange
 - [`reportNitrogenBudgetCropland()`](reportNitrogenBudgetCropland.md) :
@@ -178,6 +183,8 @@ These generate a report for a related set of variables
 - [`reportProcessing()`](reportProcessing.md) : reportProcessing
 - [`reportProcessingResiduesForestry()`](reportProcessingResiduesForestry.md)
   : reportProcessingResiduesForestry
+- [`reportProcessingWoodResidues()`](reportProcessingWoodResidues.md) :
+  reportProcessingWoodResidues
 - [`reportProducerPriceIndex()`](reportProducerPriceIndex.md) :
   reportProducerPriceIndex
 - [`reportProduction()`](reportProduction.md) : reportProduction
@@ -223,6 +230,7 @@ These generate a report for a related set of variables
 - [`reportWaterIndicators()`](reportWaterIndicators.md) :
   reportWaterIndicators
 - [`reportWaterUsage()`](reportWaterUsage.md) : reportWaterUsage
+- [`reportWoodFuel()`](reportWoodFuel.md) : reportWoodFuel
 - [`reportWorkingAgePopulation()`](reportWorkingAgePopulation.md) :
   reportWorkingAgePopulation
 - [`reportYieldShifter()`](reportYieldShifter.md) : reportYieldShifter
@@ -383,14 +391,6 @@ Calculate reporting variables
 - [`emisSOC()`](emisSOC.md) : emisSOC
 - [`expenditureIndexFood()`](expenditureIndexFood.md) :
   expenditureIndexFood
-- [`extractBiogasFeedstock()`](extractBiogasFeedstock.md) :
-  extractBiogasFeedstock
-- [`extractCropResidues2ndBE()`](extractCropResidues2ndBE.md) :
-  extractCropResidues2ndBE
-- [`extractManureFuel()`](extractManureFuel.md) : extractManureFuel
-- [`extractProcessingWoodResidues()`](extractProcessingWoodResidues.md)
-  : extractProcessingWoodResidues
-- [`extractWoodFuel()`](extractWoodFuel.md) : extractWoodFuel
 - [`factorCostShares()`](factorCostShares.md) : factorCostShares
 - [`factorCosts()`](factorCosts.md) : factorCosts
 - [`fallow()`](fallow.md) : fallow
