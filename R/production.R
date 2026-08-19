@@ -19,8 +19,9 @@
 #' @param cumulative Logical; Determines if production is reported annually (FALSE, default) or cumulative (TRUE)
 #' @param baseyear Baseyear used for cumulative production (default = 1995)
 #' @param disagg_lvst Livestock grid-level disaggregation method: "foragebased" (default, matches
-#' prior behavior) uses the pasture/cropland heuristic; "glw" forces the GLW-based weight
-#' disaggregation (requires the gridded livestock weight file to be present next to gdx).
+#' prior behavior) uses the pasture/cropland heuristic; "glw" forces disaggregation using the
+#' gridded livestock distribution file (f71_livestock_distribution_0.5.mz, produced by
+#' mrland::calcLivestockDistribution; must be present next to gdx).
 #' @return production as MAgPIE object (unit depends on attributes and cumulative)
 #' @author Benjamin Leon Bodirsky, Bin Lin
 #' @seealso \code{\link{reportProduction}}, \code{\link{demand}}
@@ -162,24 +163,25 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
 
       # NEW: GLW-based disaggregation, selected via disagg_lvst ("foragebased"/"glw"). Set
       # disagg_lvst = "glw" to disaggregate cluster-level production directly using the gridded
-      # livestock weight file instead of the pasture/cropland heuristic below.
+      # livestock distribution file instead of the pasture/cropland heuristic below.
       useGLWDisagg <- switch(disagg_lvst,
                              "foragebased" = FALSE,
                              "glw" = TRUE,
                              stop("disagg_lvst must be one of 'foragebased', 'glw'"))
 
       if (useGLWDisagg) {
-        weightFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_weight_0.5.mz")
-        if (!file.exists(weightFile)) {
-          stop("disagg_lvst = 'glw' requested but weight file not found: ", weightFile)
+        lvstDistFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_distribution_0.5.mz")
+        if (!file.exists(lvstDistFile)) {
+          stop("disagg_lvst = 'glw' requested but distribution file not found: ", lvstDistFile)
         }
         cellular_production <- production(gdx = gdx, level = "cell", products = products, product_aggr = FALSE,
                                           attributes = "dm", water_aggr = water_aggr)
-        weight <- read.magpie(weightFile)[, , products]
-        # weight is only available for historical/near-term years; hold constant for future model years
-        weight <- time_interpolate(weight, interpolated_year = getYears(cellular_production),
-                                   integrate_interpolated_years = FALSE, extrapolation_type = "constant")
-        production <- gdxAggregate(gdx = gdx, x = cellular_production, weight = weight,
+        lvstDist <- read.magpie(lvstDistFile)[, , products]
+        checkExtensiveLivestockDist(lvstDist, lvstDistFile)
+        # lvstDist is only available for historical/near-term years; hold constant for future model years
+        lvstDist <- time_interpolate(lvstDist, interpolated_year = getYears(cellular_production),
+                                     integrate_interpolated_years = FALSE, extrapolation_type = "constant")
+        production <- gdxAggregate(gdx = gdx, x = cellular_production, weight = lvstDist,
                                    absolute = TRUE, to = level)
 
         ## testing
@@ -273,3 +275,29 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
 # a working directory change leads to new caching, which is important if the
 # function is called with relative path args.
 , hash = function(x) hash(list(x, getwd(), lastModified(x$gdx))))
+
+#' Guard against a livestock distribution weight normalised within country
+#'
+#' cluster-to-grid disaggregation (gdxAggregate(from = "cell", to = "grid")) renormalises
+#' the weight within each cluster. A weight normalised within COUNTRY only agrees with that
+#' when every cluster lies inside one country, which is false for most MAgPIE clusters, and
+#' silently misallocates production between countries that share a cluster (see the
+#' calcLivestockDistribution rename / output = "head" fix). This checks for that exact
+#' signature - most countries' cells summing to ~1 - and fails loudly instead of continuing.
+#' @noRd
+checkExtensiveLivestockDist <- function(dist, distFile) {
+  if (!"iso" %in% getSets(dist)) return(invisible(NULL))
+  iso <- getItems(dist, dim = "iso", full = TRUE)
+  if (is.null(iso)) return(invisible(NULL))
+  isoSum <- tapply(as.numeric(dist[, 1, 1]), factor(iso), sum, na.rm = TRUE)
+  isoSum <- isoSum[is.finite(isoSum) & isoSum > 0]
+  if (length(isoSum) < 10) return(invisible(NULL))
+  nUnit <- sum(abs(isoSum - 1) < 1e-6)
+  if (nUnit / length(isoSum) > 0.9) {
+    stop(basename(distFile), " is normalised within country (", nUnit, " of ",
+         length(isoSum), " countries sum to 1), but cluster-to-grid disaggregation ",
+         "needs an extensive weight. Regenerate the input with ",
+         "calcOutput(\"LivestockDistribution\", output = \"head\", ...) in fullCELLULARMAGPIE.")
+  }
+  invisible(NULL)
+}

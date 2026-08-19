@@ -11,8 +11,9 @@
 #' @param awms large animal waste management categories: "grazing","stubble_grazing","fuel","confinement"),
 #' @param agg aggregation over "awms" or over "products".
 #' @param disagg_lvst Livestock grid-level disaggregation method: "foragebased" (default, matches
-#' prior behavior) uses the pasture/cropland heuristic; "glw" forces the GLW-based weight
-#' disaggregation (requires the gridded livestock weight file to be present next to gdx).
+#' prior behavior) uses the pasture/cropland heuristic; "glw" forces disaggregation using the
+#' gridded livestock distribution file (f71_livestock_distribution_0.5.mz, produced by
+#' mrland::calcLivestockDistribution; must be present next to gdx).
 #'
 #' @return MAgPIE object
 #' @author Benjamin Leon Bodirsky, Bin Lin
@@ -28,6 +29,7 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
   products=findset(products,noset = "original")
 
   manure <- collapseNames(readGDX(gdx, "ov_manure", select = list(type = "level"))[,,"nr"])
+  manureOrigSum <- sum(manure)
 
   if(level%in%c("cell")){
     #downscale to cell using magpie info
@@ -37,7 +39,7 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
 
     # NEW: GLW-based disaggregation, mirrors the approach in magpie4::production(), selected via
     # disagg_lvst ("foragebased"/"glw"). Set disagg_lvst = "glw" to disaggregate cluster-level
-    # manure directly using the gridded livestock weight file instead of the pasture/cropland
+    # manure directly using the gridded livestock distribution file instead of the pasture/cropland
     # heuristic below.
     useGLWDisagg <- switch(disagg_lvst,
                            "foragebased" = FALSE,
@@ -45,23 +47,24 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
                            stop("disagg_lvst must be one of 'foragebased', 'glw'"))
 
     if (useGLWDisagg) {
-      weightFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_weight_0.5.mz")
-      if (!file.exists(weightFile)) {
-        stop("disagg_lvst = 'glw' requested but weight file not found: ", weightFile)
+      lvstDistFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_distribution_0.5.mz")
+      if (!file.exists(lvstDistFile)) {
+        stop("disagg_lvst = 'glw' requested but distribution file not found: ", lvstDistFile)
       }
       cellular_manure <- gdxAggregate(gdx = gdx, weight = "production", x = manure, to = "cell",
                                       absolute = TRUE, products = readGDX(gdx, "kli"), product_aggr = FALSE)
 
-      weight <- read.magpie(weightFile)[, , readGDX(gdx, "kli")]
-      # weight is only available for historical/near-term years; hold constant for future model years
-      weight <- time_interpolate(weight, interpolated_year = getYears(cellular_manure),
-                                 integrate_interpolated_years = FALSE, extrapolation_type = "constant")
+      lvstDist <- read.magpie(lvstDistFile)[, , readGDX(gdx, "kli")]
+      checkExtensiveLivestockDist(lvstDist, lvstDistFile)
+      # lvstDist is only available for historical/near-term years; hold constant for future model years
+      lvstDist <- time_interpolate(lvstDist, interpolated_year = getYears(cellular_manure),
+                                   integrate_interpolated_years = FALSE, extrapolation_type = "constant")
 
-      # weight only varies by kli category, not by awms; disaggregate each awms slice separately
+      # lvstDist only varies by kli category, not by awms; disaggregate each awms slice separately
       # to avoid ambiguity aggregating a weight against manure's compound kli.awms dim3
       manure <- mbind(lapply(awms, function(a) {
         sliceManure <- collapseNames(cellular_manure[, , a])
-        disagg <- gdxAggregate(gdx = gdx, x = sliceManure, weight = weight, absolute = TRUE, to = level)
+        disagg <- gdxAggregate(gdx = gdx, x = sliceManure, weight = lvstDist, absolute = TRUE, to = level)
         add_dimension(disagg, dim = 3.2, add = "awms", nm = a)
       }))
 
@@ -121,8 +124,11 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
   }
   x=manure
 
-  ##testing
-  if (abs((sum(x)-sum(manure)))>10^-10) { warning("disaggregation failure: mismatch of sums after disaggregation")}
+  ## testing: mass conservation across the disaggregation above, against the original
+  ## regional-level total (full kli x awms, before the products/awms subsetting below).
+  ## NB: previously compared x to manure, which are the same object right above and so
+  ## always trivially equal - that never caught anything.
+  if (abs((sum(x)-manureOrigSum))>10^-10) { warning("disaggregation failure: mismatch of sums after disaggregation")}
 
   x = x[,,list(kli = products,awms = awms)]
   if("awms"%in%agg){
