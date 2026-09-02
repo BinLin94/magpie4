@@ -10,10 +10,12 @@
 #' @param products livestock products
 #' @param awms large animal waste management categories: "grazing","stubble_grazing","fuel","confinement"),
 #' @param agg aggregation over "awms" or over "products".
-#' @param disagg_lvst Livestock grid-level disaggregation method: "foragebased" (default, matches
-#' prior behavior) uses the pasture/cropland heuristic; "glw" forces disaggregation using the
-#' gridded livestock distribution file (f71_livestock_distribution_0.5.mz, produced by
-#' mrland::calcLivestockDistribution; must be present next to gdx).
+#' @param disagg_lvst Livestock grid-level disaggregation method: "landbased" (default) splits
+#' ruminant manure by awms category (grazing/fuel weighted by pasture production, stubble_grazing/
+#' confinement weighted by cropland production) and monogastric manure by development state
+#' (urban vs cropland weighted); "glw" disaggregates using the gridded livestock distribution file
+#' (f71_livestock_distribution_0.5.mz, produced by mrland::calcLivestockDistribution; must be
+#' present next to gdx).
 #'
 #' @return MAgPIE object
 #' @author Benjamin Leon Bodirsky, Bin Lin
@@ -24,7 +26,7 @@
 #'   }
 #'
 
-ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazing","stubble_grazing","fuel","confinement"), agg=TRUE, disagg_lvst = "foragebased") {
+ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazing","stubble_grazing","fuel","confinement"), agg=TRUE, disagg_lvst = "landbased") {
 
   products=findset(products,noset = "original")
 
@@ -37,14 +39,12 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
   }
   if(level %in% c("grid","iso")) {
 
-    # NEW: GLW-based disaggregation, mirrors the approach in magpie4::production(), selected via
-    # disagg_lvst ("foragebased"/"glw"). Set disagg_lvst = "glw" to disaggregate cluster-level
-    # manure directly using the gridded livestock distribution file instead of the pasture/cropland
-    # heuristic below.
+    # disagg_lvst = "glw" disaggregates cluster-level manure directly using the gridded
+    # livestock distribution file, instead of the land-based heuristic below.
     useGLWDisagg <- switch(disagg_lvst,
-                           "foragebased" = FALSE,
+                           "landbased" = FALSE,
                            "glw" = TRUE,
-                           stop("disagg_lvst must be one of 'foragebased', 'glw'"))
+                           stop("disagg_lvst must be one of 'landbased', 'glw'"))
 
     if (useGLWDisagg) {
       lvstDistFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_distribution_0.5.mz")
@@ -125,9 +125,7 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
   x=manure
 
   ## testing: mass conservation across the disaggregation above, against the original
-  ## regional-level total (full kli x awms, before the products/awms subsetting below).
-  ## NB: previously compared x to manure, which are the same object right above and so
-  ## always trivially equal - that never caught anything.
+  ## regional-level total (full kli x awms, before the products/awms subsetting below)
   if (abs((sum(x)-manureOrigSum))>10^-10) { warning("disaggregation failure: mismatch of sums after disaggregation")}
 
   x = x[,,list(kli = products,awms = awms)]

@@ -18,9 +18,11 @@
 #' @param water_aggr aggregate irrigated and non-irriagted production or not (boolean).
 #' @param cumulative Logical; Determines if production is reported annually (FALSE, default) or cumulative (TRUE)
 #' @param baseyear Baseyear used for cumulative production (default = 1995)
-#' @param disagg_lvst Livestock grid-level disaggregation method: "foragebased" (default, matches
-#' prior behavior) uses the pasture/cropland heuristic; "glw" forces disaggregation using the
-#' gridded livestock distribution file (f71_livestock_distribution_0.5.mz, produced by
+#' @param disagg_lvst Livestock grid-level disaggregation method: "feedbased" (default) splits
+#' ruminant production between pasture- and cropland-weighted grid cells by feed composition
+#' (pasture vs fodder share), and weights monogastric production by urban land; "glw"
+#' disaggregates using the gridded livestock distribution file (f71_livestock_distribution_0.5.mz,
+#' produced by
 #' mrland::calcLivestockDistribution; must be present next to gdx).
 #' @return production as MAgPIE object (unit depends on attributes and cumulative)
 #' @author Benjamin Leon Bodirsky, Bin Lin
@@ -31,7 +33,7 @@
 #' }
 #'
 production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall", product_aggr = FALSE, attributes = "dm",
-                       water_aggr = TRUE, cumulative = FALSE, baseyear = 1995, disagg_lvst = "foragebased") {
+                       water_aggr = TRUE, cumulative = FALSE, baseyear = 1995, disagg_lvst = "feedbased") {
 
   if (!all(products %in% readGDX(gdx, "kall"))) {
     products <- readGDX(gdx, products)
@@ -161,13 +163,12 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
       )
     } else if (all(products %in% findset("kli"))) {
 
-      # NEW: GLW-based disaggregation, selected via disagg_lvst ("foragebased"/"glw"). Set
-      # disagg_lvst = "glw" to disaggregate cluster-level production directly using the gridded
-      # livestock distribution file instead of the pasture/cropland heuristic below.
+      # disagg_lvst = "glw" disaggregates cluster-level production directly using the gridded
+      # livestock distribution file, instead of the pasture/cropland heuristic below.
       useGLWDisagg <- switch(disagg_lvst,
-                             "foragebased" = FALSE,
+                             "feedbased" = FALSE,
                              "glw" = TRUE,
-                             stop("disagg_lvst must be one of 'foragebased', 'glw'"))
+                             stop("disagg_lvst must be one of 'feedbased', 'glw'"))
 
       if (useGLWDisagg) {
         lvstDistFile <- file.path(dirname(normalizePath(gdx)), "f71_livestock_distribution_0.5.mz")
