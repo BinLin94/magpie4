@@ -22,8 +22,7 @@
 #' ruminant production between pasture- and cropland-weighted grid cells by feed composition
 #' (pasture vs fodder share), and weights monogastric production by urban land; "glw"
 #' disaggregates using the gridded livestock distribution file (f71_livestock_distribution_0.5.mz,
-#' produced by
-#' mrland::calcLivestockDistribution; must be present next to gdx).
+#' produced by mrland::calcLivestockDistribution; must be present next to gdx).
 #' @return production as MAgPIE object (unit depends on attributes and cumulative)
 #' @author Benjamin Leon Bodirsky, Bin Lin
 #' @seealso \code{\link{reportProduction}}, \code{\link{demand}}
@@ -163,7 +162,7 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
       )
     } else if (all(products %in% findset("kli"))) {
 
-      # disagg_lvst = "glw" disaggregates cluster-level production directly using the gridded
+      # disagg_lvst = "glw" disaggregates regional-level production directly using the gridded
       # livestock distribution file, instead of the pasture/cropland heuristic below.
       useGLWDisagg <- switch(disagg_lvst,
                              "feedbased" = FALSE,
@@ -175,24 +174,23 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
         if (!file.exists(lvstDistFile)) {
           stop("disagg_lvst = 'glw' requested but distribution file not found: ", lvstDistFile)
         }
-        cellular_production <- production(gdx = gdx, level = "cell", products = products, product_aggr = FALSE,
-                                          attributes = "dm", water_aggr = water_aggr)
+        regional_production <- production(gdx = gdx, level = "reg", products = products, product_aggr = FALSE,
+                                           attributes = "dm", water_aggr = water_aggr)
         lvstDist <- read.magpie(lvstDistFile)[, , products]
         checkExtensiveLivestockDist(lvstDist, lvstDistFile)
         # lvstDist is only available for historical/near-term years; hold constant for future model years
-        lvstDist <- time_interpolate(lvstDist, interpolated_year = getYears(cellular_production),
+        lvstDist <- time_interpolate(lvstDist, interpolated_year = getYears(regional_production),
                                      integrate_interpolated_years = FALSE, extrapolation_type = "constant")
-        production <- gdxAggregate(gdx = gdx, x = cellular_production, weight = lvstDist,
+        production <- gdxAggregate(gdx = gdx, x = regional_production, weight = lvstDist,
                                    absolute = TRUE, to = level)
 
         ## testing
-        if (abs((sum(production) - sum(cellular_production))) > 10e-10) {
+        if (abs((sum(production) - sum(regional_production))) > 10e-10) {
           warning("disaggregation failure: mismatch of sums after disaggregation")
         }
       }
 
       if (!useGLWDisagg) {
-      warning("Disaggregation of livestock to grid level starts from regional level instead of cluster level.")
       x <- production(gdx = gdx, level = "reg", products = "kli", product_aggr = FALSE, attributes = "dm",
                       water_aggr = water_aggr)
 
