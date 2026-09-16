@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">magpie4</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.78.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.81.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,8 @@
 <span>  attributes <span class="op">=</span> <span class="st">"dm"</span>,</span>
 <span>  water_aggr <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cumulative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  baseyear <span class="op">=</span> <span class="fl">1995</span></span>
+<span>  baseyear <span class="op">=</span> <span class="fl">1995</span>,</span>
+<span>  disagg_lvst <span class="op">=</span> <span class="st">"feedbased"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -92,6 +93,14 @@ potash: Mt ("k"), wet matter: Mt ("wm"). Can also be a vector.</p></dd>
 <dt id="arg-baseyear">baseyear<a class="anchor" aria-label="anchor" href="#arg-baseyear"></a></dt>
 <dd><p>Baseyear used for cumulative production (default = 1995)</p></dd>
 
+
+<dt id="arg-disagg-lvst">disagg_lvst<a class="anchor" aria-label="anchor" href="#arg-disagg-lvst"></a></dt>
+<dd><p>Livestock grid-level disaggregation method: "feedbased" (default) splits
+ruminant production between pasture- and cropland-weighted grid cells by feed composition
+(pasture vs fodder share), and weights monogastric production by urban land; "glw"
+disaggregates using the gridded livestock distribution file (f71_livestock_distribution_0.5.mz,
+produced by mrland::calcLivestockDistribution; must be present next to gdx).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -103,7 +112,7 @@ potash: Mt ("k"), wet matter: Mt ("wm"). Can also be a vector.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Benjamin Leon Bodirsky</p>
+    <p>Benjamin Leon Bodirsky, Bin Lin</p>
     </div>
 
     <div class="section level2">

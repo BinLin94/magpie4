@@ -14,7 +14,8 @@ production(
   attributes = "dm",
   water_aggr = TRUE,
   cumulative = FALSE,
-  baseyear = 1995
+  baseyear = 1995,
+  disagg_lvst = "feedbased"
 )
 ```
 
@@ -62,6 +63,16 @@ production(
 
   Baseyear used for cumulative production (default = 1995)
 
+- disagg_lvst:
+
+  Livestock grid-level disaggregation method: "feedbased" (default)
+  splits ruminant production between pasture- and cropland-weighted grid
+  cells by feed composition (pasture vs fodder share), and weights
+  monogastric production by urban land; "glw" disaggregates using the
+  gridded livestock distribution file
+  (f71_livestock_distribution_0.5.mz, produced by
+  mrland::calcLivestockDistribution; must be present next to gdx).
+
 ## Value
 
 production as MAgPIE object (unit depends on attributes and cumulative)
@@ -72,7 +83,7 @@ production as MAgPIE object (unit depends on attributes and cumulative)
 
 ## Author
 
-Benjamin Leon Bodirsky
+Benjamin Leon Bodirsky, Bin Lin
 
 ## Examples
 

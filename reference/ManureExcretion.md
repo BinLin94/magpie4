@@ -10,7 +10,8 @@ ManureExcretion(
   level = "reg",
   products = "kli",
   awms = c("grazing", "stubble_grazing", "fuel", "confinement"),
-  agg = TRUE
+  agg = TRUE,
+  disagg_lvst = "landbased"
 )
 ```
 
@@ -37,13 +38,23 @@ ManureExcretion(
 
   aggregation over "awms" or over "products".
 
+- disagg_lvst:
+
+  Livestock grid-level disaggregation method: "landbased" (default)
+  splits ruminant manure by awms category (grazing/fuel weighted by
+  pasture production, stubble_grazing/ confinement weighted by cropland
+  production) and monogastric manure by development state (urban vs
+  cropland weighted); "glw" disaggregates using the gridded livestock
+  distribution file (f71_livestock_distribution_0.5.mz, produced by
+  mrland::calcLivestockDistribution; must be present next to gdx).
+
 ## Value
 
 MAgPIE object
 
 ## Author
 
-Benjamin Leon Bodirsky
+Benjamin Leon Bodirsky, Bin Lin
 
 ## Examples
 
