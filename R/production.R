@@ -181,8 +181,9 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
         # lvstDist is only available for historical/near-term years; hold constant for future model years
         lvstDist <- time_interpolate(lvstDist, interpolated_year = getYears(regional_production),
                                      integrate_interpolated_years = FALSE, extrapolation_type = "constant")
+        # to grid; the tail gdxAggregate takes it to level
         production <- gdxAggregate(gdx = gdx, x = regional_production, weight = lvstDist,
-                                   absolute = TRUE, to = level)
+                                   absolute = TRUE, to = "grid")
 
         ## testing
         if (abs((sum(production) - sum(regional_production))) > 10e-10) {

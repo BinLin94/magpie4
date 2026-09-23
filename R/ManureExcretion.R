@@ -62,7 +62,9 @@ ManureExcretion <- memoise(function(gdx,level="reg",products="kli",awms=c("grazi
 
       # lvstDist only varies by kli category, not by awms; disaggregate each awms slice separately
       # to avoid ambiguity aggregating a weight against manure's compound kli.awms dim3
-      manure <- mbind(lapply(awms, function(a) {
+      # every awms; the subset is selected further down
+      awmsAll <- getItems(cellular_manure, dim = 3.2)
+      manure <- mbind(lapply(awmsAll, function(a) {
         sliceManure <- collapseNames(cellular_manure[, , a])
         disagg <- gdxAggregate(gdx = gdx, x = sliceManure, weight = lvstDist, absolute = TRUE, to = level)
         add_dimension(disagg, dim = 3.2, add = "awms", nm = a)
