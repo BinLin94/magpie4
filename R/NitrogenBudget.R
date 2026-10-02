@@ -78,7 +78,7 @@ NitrogenBudget <- memoise(function(gdx, include_emissions = FALSE,
     manureRecycling <- dimSums(manureConfinement * recyclingShare, dim = c(3.2, 3.3))
     manureRecycling <- gdxAggregate(gdx = gdx, weight = "ManureExcretion", x = manureRecycling,
                                     to = level, absolute = TRUE, products = readGDX(gdx, "kli"),
-                                    awms = "confinement", agg = "awms")
+                                    awms = "confinement", agg = "awms", recycled = TRUE)
     manure <- dimSums(manureRecycling, dim = 3)
 
     croplandgrazing <- dimSums(readGDX(gdx, "ov_manure",
