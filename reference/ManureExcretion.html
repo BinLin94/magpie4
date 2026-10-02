@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">magpie4</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.83.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.83.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,8 @@
 <span>  products <span class="op">=</span> <span class="st">"kli"</span>,</span>
 <span>  awms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grazing"</span>, <span class="st">"stubble_grazing"</span>, <span class="st">"fuel"</span>, <span class="st">"confinement"</span><span class="op">)</span>,</span>
 <span>  agg <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  disagg_lvst <span class="op">=</span> <span class="st">"landbased"</span></span>
+<span>  disagg_lvst <span class="op">=</span> <span class="st">"landbased"</span>,</span>
+<span>  recycled <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -65,7 +66,7 @@
 
 
 <dt id="arg-awms">awms<a class="anchor" aria-label="anchor" href="#arg-awms"></a></dt>
-<dd><p>large animal waste management categories: "grazing","stubble_grazing","fuel","confinement"),</p></dd>
+<dd><p>animal waste management systems: "grazing", "stubble_grazing", "fuel", "confinement"</p></dd>
 
 
 <dt id="arg-agg">agg<a class="anchor" aria-label="anchor" href="#arg-agg"></a></dt>
@@ -73,12 +74,15 @@
 
 
 <dt id="arg-disagg-lvst">disagg_lvst<a class="anchor" aria-label="anchor" href="#arg-disagg-lvst"></a></dt>
-<dd><p>Livestock grid-level disaggregation method: "landbased" (default) splits
-ruminant manure by awms category (grazing/fuel weighted by pasture production, stubble_grazing/
-confinement weighted by cropland production) and monogastric manure by development state
-(urban vs cropland weighted); "glw" disaggregates using the gridded livestock distribution file
-(f71_livestock_distribution_0.5.mz, produced by mrland::calcLivestockDistribution; must be
-present next to gdx).</p></dd>
+<dd><p>grid-level disaggregation method (level "grid"/"iso" only):
+"landbased" (default) weights ruminant manure by pasture or crop production and monogastric
+manure by urban or cropland area; "glw" weights by the gridded livestock distribution
+(f71_livestock_distribution_0.5.mz next to gdx) times the pasture share (grazing, fuel)
+or cropland share (stubble_grazing).</p></dd>
+
+
+<dt id="arg-recycled">recycled<a class="anchor" aria-label="anchor" href="#arg-recycled"></a></dt>
+<dd><p>"glw" only: if TRUE, confinement manure is also weighted by the cropland share.</p></dd>
 
 </dl></div>
     <div class="section level2">

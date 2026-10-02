@@ -11,7 +11,8 @@ ManureExcretion(
   products = "kli",
   awms = c("grazing", "stubble_grazing", "fuel", "confinement"),
   agg = TRUE,
-  disagg_lvst = "landbased"
+  disagg_lvst = "landbased",
+  recycled = FALSE
 )
 ```
 
@@ -31,8 +32,8 @@ ManureExcretion(
 
 - awms:
 
-  large animal waste management categories:
-  "grazing","stubble_grazing","fuel","confinement"),
+  animal waste management systems: "grazing", "stubble_grazing", "fuel",
+  "confinement"
 
 - agg:
 
@@ -40,13 +41,17 @@ ManureExcretion(
 
 - disagg_lvst:
 
-  Livestock grid-level disaggregation method: "landbased" (default)
-  splits ruminant manure by awms category (grazing/fuel weighted by
-  pasture production, stubble_grazing/ confinement weighted by cropland
-  production) and monogastric manure by development state (urban vs
-  cropland weighted); "glw" disaggregates using the gridded livestock
-  distribution file (f71_livestock_distribution_0.5.mz, produced by
-  mrland::calcLivestockDistribution; must be present next to gdx).
+  grid-level disaggregation method (level "grid"/"iso" only):
+  "landbased" (default) weights ruminant manure by pasture or crop
+  production and monogastric manure by urban or cropland area; "glw"
+  weights by the gridded livestock distribution
+  (f71_livestock_distribution_0.5.mz next to gdx) times the pasture
+  share (grazing, fuel) or cropland share (stubble_grazing).
+
+- recycled:
+
+  "glw" only: if TRUE, confinement manure is also weighted by the
+  cropland share.
 
 ## Value
 
