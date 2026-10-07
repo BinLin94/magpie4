@@ -162,8 +162,8 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
       )
     } else if (all(products %in% findset("kli"))) {
 
-      # disagg_lvst = "glw" disaggregates regional-level production directly using the gridded
-      # livestock distribution file, instead of the pasture/cropland heuristic below.
+      # disagg_lvst = "glw": regional production is distributed to the grid with the gridded
+      # livestock distribution file next to the gdx
       useGLWDisagg <- switch(disagg_lvst,
                              "feedbased" = FALSE,
                              "glw" = TRUE,
@@ -278,12 +278,11 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
 
 #' Guard against a livestock distribution weight normalised within country
 #'
-#' cluster-to-grid disaggregation (gdxAggregate(from = "cell", to = "grid")) renormalises
-#' the weight within each cluster. A weight normalised within COUNTRY only agrees with that
-#' when every cluster lies inside one country, which is false for most MAgPIE clusters, and
-#' silently misallocates production between countries that share a cluster (see the
-#' calcLivestockDistribution rename / output = "head" fix). This checks for that exact
-#' signature - most countries' cells summing to ~1 - and fails loudly instead of continuing.
+#' Disaggregating regional values to the grid with gdxAggregate() renormalises the weight
+#' within each region. A weight normalised within country agrees with that only if a region
+#' holds a single country, which is false for most MAgPIE regions, and would silently
+#' misallocate between the countries of a region. This checks for that signature - most
+#' countries' cells summing to ~1 - and stops.
 #' @noRd
 checkExtensiveLivestockDist <- function(dist, distFile) {
   if (!"iso" %in% getSets(dist)) return(invisible(NULL))
