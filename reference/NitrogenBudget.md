@@ -14,7 +14,7 @@ NitrogenBudget(
   cropTypes = FALSE,
   threshold = 0.05,
   progress = TRUE,
-  disagg_lvst = "landbased"
+  disaggLvst = "landbased"
 )
 ```
 
@@ -49,7 +49,7 @@ NitrogenBudget(
 
   passed to mstools::toolFertilizerDistribution
 
-- disagg_lvst:
+- disaggLvst:
 
   grid-level disaggregation of the manure applied to cropland
   (confinement manure recycled to cropland and stubble grazing), passed

@@ -15,7 +15,7 @@ production(
   water_aggr = TRUE,
   cumulative = FALSE,
   baseyear = 1995,
-  disagg_lvst = "feedbased"
+  disaggLvst = "feedbased"
 )
 ```
 
@@ -63,7 +63,7 @@ production(
 
   Baseyear used for cumulative production (default = 1995)
 
-- disagg_lvst:
+- disaggLvst:
 
   Livestock grid-level disaggregation method: "feedbased" (default)
   splits ruminant production between pasture- and cropland-weighted grid

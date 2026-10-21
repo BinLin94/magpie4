@@ -11,7 +11,7 @@ ManureExcretion(
   products = "kli",
   awms = c("grazing", "stubble_grazing", "fuel", "confinement"),
   agg = TRUE,
-  disagg_lvst = "landbased",
+  disaggLvst = "landbased",
   recycled = FALSE
 )
 ```
@@ -39,7 +39,7 @@ ManureExcretion(
 
   aggregation over "awms" or over "products".
 
-- disagg_lvst:
+- disaggLvst:
 
   grid-level disaggregation method (level "grid"/"iso" only):
   "landbased" (default) weights ruminant manure by pasture or crop
