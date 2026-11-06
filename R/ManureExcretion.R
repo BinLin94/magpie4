@@ -47,7 +47,7 @@ ManureExcretion <- memoise(function(gdx, level = "reg", products = "kli",
                            stop("disaggLvst must be one of 'landbased', 'glw'"))
 
     if (useGLWDisagg) {
-      lvstDist <- readLivestockDistribution(gdx, readGDX(gdx, "kli"), getYears(manure))
+      lvstDist <- livestockDistribution(gdx, readGDX(gdx, "kli"), getYears(manure))
 
       # land share per grid cell; the offset keeps a non-zero weight where the land type is absent
       gridLand <- land(gdx, level = "grid")[, getYears(manure), ]

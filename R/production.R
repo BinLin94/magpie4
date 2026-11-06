@@ -172,7 +172,7 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
       if (useGLWDisagg) {
         regionalProduction <- production(gdx = gdx, level = "reg", products = products, product_aggr = FALSE,
                                          attributes = "dm", water_aggr = water_aggr)
-        lvstDist <- readLivestockDistribution(gdx, products, getYears(regionalProduction))
+        lvstDist <- livestockDistribution(gdx, products, getYears(regionalProduction))
         # to grid; the tail gdxAggregate takes it to level
         production <- gdxAggregate(gdx = gdx, x = regionalProduction, weight = lvstDist,
                                    absolute = TRUE, to = "grid")
@@ -181,55 +181,53 @@ production <- memoise(function(gdx, file = NULL, level = "reg", products = "kall
         if (abs((sum(production) - sum(regionalProduction))) > 10e-10) {
           warning("disaggregation failure: mismatch of sums after disaggregation")
         }
-      }
+      } else {
+        x <- production(gdx = gdx, level = "reg", products = "kli", product_aggr = FALSE, attributes = "dm",
+                        water_aggr = water_aggr)
 
-      if (!useGLWDisagg) {
-      x <- production(gdx = gdx, level = "reg", products = "kli", product_aggr = FALSE, attributes = "dm",
-                      water_aggr = water_aggr)
+        kli_rum    <- c("livst_rum", "livst_milk")
+        kli_mon    <- c("livst_pig", "livst_chick", "livst_egg")
+        ruminants    <- x[, , kli_rum]
+        monogastrics <- x[, , kli_mon]
 
-      kli_rum    <- c("livst_rum", "livst_milk")
-      kli_mon    <- c("livst_pig", "livst_chick", "livst_egg")
-      ruminants    <- x[, , kli_rum]
-      monogastrics <- x[, , kli_mon]
+        warning("Disaggregation of livestock is done based on an method which is currently inconsistent with the method used in madrat")
 
-      warning("Disaggregation of livestock is done based on an method which is currently inconsistent with the method used in madrat")
+        feed <- feed(gdx, level = "reg")
+        feedshr <- collapseNames(feed[, , "pasture"] / dimSums(feed[, , c("pasture", "foddr")], dim = 3.2))[, , kli_rum]
+        feedshr[!is.finite(feedshr)] <- 0
 
-      feed <- feed(gdx, level = "reg")
-      feedshr <- collapseNames(feed[, , "pasture"] / dimSums(feed[, , c("pasture", "foddr")], dim = 3.2))[, , kli_rum]
-      feedshr[!is.finite(feedshr)] <- 0
+        ruminants_pasture <- ruminants * feedshr
+        ruminants_crop <- ruminants * (1 - feedshr)
 
-      ruminants_pasture <- ruminants * feedshr
-      ruminants_crop <- ruminants * (1 - feedshr)
+        ruminants_pasture <- gdxAggregate(
+          gdx = gdx,
+          x = ruminants_pasture,
+          weight = "production", products = "pasture",
+          absolute = TRUE, to = "grid"
+        )
 
-      ruminants_pasture <- gdxAggregate(
-        gdx = gdx,
-        x = ruminants_pasture,
-        weight = "production", products = "pasture",
-        absolute = TRUE, to = "grid"
-      )
+        ruminants_crop <- gdxAggregate(
+          gdx = gdx,
+          x = ruminants_crop,
+          weight = "production", products = "foddr",
+          absolute = TRUE, to = "grid"
+        )
 
-      ruminants_crop <- gdxAggregate(
-        gdx = gdx,
-        x = ruminants_crop,
-        weight = "production", products = "foddr",
-        absolute = TRUE, to = "grid"
-      )
+        ruminants <- ruminants_crop + ruminants_pasture
 
-      ruminants <- ruminants_crop + ruminants_pasture
+        monogastrics <- gdxAggregate(
+          gdx = gdx,
+          x = monogastrics,
+          weight = "land", types = "urban",
+          absolute = TRUE, to = "grid"
+        )
 
-      monogastrics <- gdxAggregate(
-        gdx = gdx,
-        x = monogastrics,
-        weight = "land", types = "urban",
-        absolute = TRUE, to = "grid"
-      )
+        production <- mbind(monogastrics, ruminants)
 
-      production <- mbind(monogastrics, ruminants)
-
-      ## testing
-      if (abs((sum(production) - sum(x))) > 10e-10) {
-        warning("disaggregation failure: mismatch of sums after disaggregation")
-      }
+        ## testing
+        if (abs((sum(production) - sum(x))) > 10e-10) {
+          warning("disaggregation failure: mismatch of sums after disaggregation")
+        }
       }
 
     } else {
